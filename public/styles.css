@@ -1,0 +1,16 @@
+body {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  font-size: 20px;
+}
+
+body > div {
+  border: 1px solid black;
+  width: 500px;
+}
+
+input {
+  margin: 20px;
+}
