@@ -14,4 +14,5 @@ export default function bindRoutes(app) {
   app.get('/features', FeatureController.allFeatures);
   app.get('/bugs', BugController.allBugs);
   app.post('/createBug', BugController.insertBug);
+  app.post('/createFeature', FeatureController.insertFeature);
 }

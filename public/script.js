@@ -72,6 +72,28 @@ const postBug = () => {
     });
 };
 
+const featureDiv = document.createElement('div');
+createPElement('Features:', featureDiv);
+
+// ajax get request to display all features from SQL Features table
+const renderFeatureListData = () => {
+  axios
+    .get('/features')
+    .then((response) => {
+      for (let i = 0; i < response.data.features.length; i += 1) {
+        const featureName = response.data.features[i].name;
+        const featureLabel = createLabel(featureName, featureName, featureName);
+        const featureInput = createInput('radio', 'featureBtn', featureName, response.data.features[i].id);
+        featureDiv.appendChild(featureLabel);
+        featureDiv.appendChild(featureInput);
+        featureDiv.appendChild(createBrElement());
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
 // to create all html elements within the bug form div container
 const createBugForm = () => {
   const createBugDiv = document.createElement('div');
@@ -98,26 +120,7 @@ const createBugForm = () => {
   commitDiv.appendChild(commitInput);
   createBugDiv.appendChild(commitDiv);
 
-  const featureDiv = document.createElement('div');
-  createPElement('Features:', featureDiv);
-
-  // ajax get request to display all features from SQL Features table
-  axios
-    .get('/features')
-    .then((response) => {
-      for (let i = 0; i < response.data.features.length; i += 1) {
-        const featureName = response.data.features[i].name;
-        const featureLabel = createLabel(featureName, featureName, featureName);
-        const featureInput = createInput('radio', 'featureBtn', featureName, i + 1);
-        featureDiv.appendChild(featureLabel);
-        featureDiv.appendChild(featureInput);
-        featureDiv.appendChild(createBrElement());
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
+  renderFeatureListData();
   createBugDiv.appendChild(featureDiv);
 
   const submitButton = document.createElement('input');
@@ -137,20 +140,54 @@ const createBugList = () => {
   renderBugListData();
 };
 
+// ajax post request to insert a feature in to sql data
+const postFeature = () => {
+  console.log(document.querySelector('input[name="feature"]').value);
+
+  axios
+    .post('/createFeature', {
+      feature: document.querySelector('input[name="feature"]').value,
+    })
+    .then((response) => {
+      // clear the feature list
+      featureDiv.innerHTML = '';
+      renderFeatureListData();
+    }).catch((error) => {
+      console.log(error);
+    });
+};
+
 // function to form the feature div container
 const createFeatureForm = () => {
   const createFeatureDiv = document.createElement('div');
   createPElement('Create Feature Form', createFeatureDiv);
 
-  const featureDiv = document.createElement('div');
+  const featureDiv2 = document.createElement('div');
 
   const featureLabel = createLabel('feature', 'feature', 'Feature:    ');
   const featureInput = createInput('text', 'feature', 'feature', '', 'required');
-  featureDiv.appendChild(featureLabel);
-  featureDiv.appendChild(featureInput);
-  createFeatureDiv.appendChild(featureDiv);
+  featureDiv2.appendChild(featureLabel);
+  featureDiv2.appendChild(featureInput);
+  createFeatureDiv.appendChild(featureDiv2);
+
+  const submitFeatureButton = document.createElement('input');
+  submitFeatureButton.setAttribute('type', 'submit');
+  submitFeatureButton.setAttribute('value', 'Create Feature');
+  submitFeatureButton.addEventListener('click', postFeature);
+  featureDiv2.appendChild(submitFeatureButton);
 
   document.body.appendChild(createFeatureDiv);
+  createFeatureDiv.style.display = 'none';
+
+  // button that render the create feature form
+  const getFeatureForm = document.createElement('button');
+  getFeatureForm.setAttribute('type', 'button');
+  getFeatureForm.innerHTML = 'Create Feature Form';
+  getFeatureForm.addEventListener('click', () => {
+    createFeatureDiv.style.display = '';
+    getFeatureForm.style.display = 'none';
+  });
+  document.body.appendChild(getFeatureForm);
 };
 
 // init function when page loads

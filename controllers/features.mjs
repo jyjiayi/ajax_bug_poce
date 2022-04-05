@@ -8,5 +8,20 @@ export default function initFeaturesController(db) {
       console.log(error);
     }
   };
-  return { allFeatures };
+
+  const insertFeature = async (req, res) => {
+    try {
+      const feature = await db.Feature.create({
+        name: req.body.feature,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+      console.log('feature :>> ', feature);
+      res.send({ feature });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return { allFeatures, insertFeature };
 }
