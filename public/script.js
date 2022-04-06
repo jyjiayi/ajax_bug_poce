@@ -45,6 +45,7 @@ const renderBugListData = () => {
         createPElement(`Error Text: ${response.data.bugs[i].error_text}`, bugListDiv);
         createPElement(`Commit: ${response.data.bugs[i].commit}`, bugListDiv);
         createPElement(`Feature: ${response.data.bugs[i].feature.name}`, bugListDiv);
+        createPElement(`User: ${response.data.bugs[i].user_id}`, bugListDiv);
       }
     })
     .catch((error) => {
@@ -66,6 +67,7 @@ const postBug = () => {
       featureId: Number(document.querySelector('input[name="featureBtn"]:checked').value),
     })
     .then((response) => {
+      bugListDiv.innerHTML = '';
       renderBugListData();
     }).catch((error) => {
       console.log(error);
@@ -190,11 +192,108 @@ const createFeatureForm = () => {
   document.body.appendChild(getFeatureForm);
 };
 
+const postUser = () => {
+  axios
+    .post('/createUser', {
+      email: document.querySelector('input[name="email"]').value,
+      password: document.querySelector('input[name="password"]').value,
+    })
+    .then((response) => {
+      console.log('sign up success!');
+    }).catch((error) => {
+      console.log(error);
+    });
+};
+
+// container for the sign up form
+const signupDiv = document.createElement('div');
+
+const createSignUp = () => {
+  const emailLabel = createLabel('email', 'email', 'Email:      ');
+  const emailInput = createInput('text', 'email', 'email', '', 'required');
+  const passwordLabel = createLabel('password', 'password', 'Password:      ');
+  const passwordInput = createInput('text', 'password', 'password', '', 'required');
+  signupDiv.appendChild(emailLabel);
+  signupDiv.appendChild(emailInput);
+  signupDiv.appendChild(createBrElement());
+  signupDiv.appendChild(passwordLabel);
+  signupDiv.appendChild(passwordInput);
+  signupDiv.appendChild(createBrElement());
+
+  const signUpButton = document.createElement('input');
+  signUpButton.setAttribute('type', 'submit');
+  signUpButton.setAttribute('value', 'Sign Up');
+  signupDiv.appendChild(signUpButton);
+
+  signUpButton.addEventListener('click', () => {
+    postUser();
+    signupDiv.style.display = 'none';
+  });
+
+  document.body.appendChild(signupDiv);
+};
+
+// function to login
+const getUser = () => {
+  axios
+    .post('/login', {
+      email: document.querySelector('input[name="email2"]').value,
+      password: document.querySelector('input[name="password2"]').value,
+    })
+    .then((response) => {
+      axios
+        .get('/user')
+        .then((response1) => {
+          // display the email to show user is logged in
+          const dashboardDiv = document.createElement('div');
+          createPElement(response1.data.user.email, dashboardDiv);
+          document.body.appendChild(dashboardDiv);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+// container for login form
+const createLogin = () => {
+  const loginDiv = document.createElement('div');
+
+  const emailLabel = createLabel('email2', 'email2', 'Email:      ');
+  const emailInput = createInput('text', 'email2', 'email2', '', 'required');
+  const passwordLabel = createLabel('password2', 'password2', 'Password:      ');
+  const passwordInput = createInput('text', 'password2', 'password2', '', 'required');
+  loginDiv.appendChild(emailLabel);
+  loginDiv.appendChild(emailInput);
+  loginDiv.appendChild(createBrElement());
+  loginDiv.appendChild(passwordLabel);
+  loginDiv.appendChild(passwordInput);
+  loginDiv.appendChild(createBrElement());
+
+  const loginButton = document.createElement('input');
+  loginButton.setAttribute('type', 'submit');
+  loginButton.setAttribute('value', 'Login');
+  loginDiv.appendChild(loginButton);
+
+  loginButton.addEventListener('click', () => {
+    getUser();
+    loginDiv.style.display = 'none';
+    signupDiv.style.display = 'none';
+    createBugForm();
+    createBugList();
+    createFeatureForm();
+  });
+
+  document.body.appendChild(loginDiv);
+};
+
 // init function when page loads
 const main = () => {
-  createBugForm();
-  createBugList();
-  createFeatureForm();
+  createSignUp();
+  createLogin();
 };
 
 main();

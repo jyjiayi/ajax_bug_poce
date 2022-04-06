@@ -26,6 +26,14 @@ export default function bugModel(Sequelize, DataTypes) {
         key: 'id',
       },
     },
+    user_id: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      references: {
+        model: 'users',
+        key: 'id',
+      },
+    },
     created_at: {
       allowNull: false,
       type: DataTypes.DATE,
